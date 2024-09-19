@@ -135,7 +135,7 @@ router.post("/send-link", async (req, res) => {
       return res.status(400).json({ message: "Invalid RC Number" });
     }
     //Generate App_User registration link
-    const registrationLink = `http://localhost:7000/register?email=${email}&rc_number=${rc_number}`;
+    const registrationLink = `https://conebackend.onrender.com/register?email=${email}&rc_number=${rc_number}`;
 
     //Send registration link via email
     const mailOption = {
