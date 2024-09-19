@@ -30,7 +30,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //Nodemailer
 const transporter = nodemailer.createTransport({
-    service: 'Hotmail',
+    host: 'smtp-mail.outlook.com',
+    port: 587,
+    secure: true,
     auth: {
         user: process.env.EMAIL,
         pass: process.env.PASSWORD
