@@ -16,7 +16,7 @@ const app = express();
 connectDB();
 const authRoutes = require("./routes/auth");
 const tenantAdminRoutes = require("./routes/tenantRoute");
-const User = require("./models/tenantModel");
+const Client = require("./models/clientModel");
 
 const { protect, auth } = require("./middleware/auth");
 
@@ -51,27 +51,27 @@ app.use("/api/tenant", tenantAdminRoutes);
 
 
 app.post("/quick", async (req, res) => {
-  const { name, password, rc_number, email,secondary_email,phone,secondary_phone,
+  const { username, name, password, email,secondary_email,phone,secondary_phone,
     role,
   } = req.body;
 
   //Check if all required data has been entered
   if (
-    !(password && name && email && secondary_email && phone && secondary_phone && role && rc_number
+    !(username && password && name && email && phone && role 
     )
   ) {
     res.status(400).send("All input is required");
   }  
   try {
-    const appUserExist = await User.findOne({email} );
+    const appUserExist = await Client.findOne({email} );
     if (appUserExist) {
         res.status(400).json({ message: "A user with this info already exist." });
       } else {
         hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ 
+        const user = new Client({
+            username: username, 
             name: name,
-            password: hashedPassword,
-            rc_number: rc_number,
+            password: hashedPassword,            
             email: email,
             secondary_email:secondary_email,
             phone: phone,

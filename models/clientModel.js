@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 // Define the Client schema
-const appUserSchema = new Schema({
+const clientScema = new Schema({
     username: { 
         type: String, 
         required: true, 
@@ -12,10 +12,12 @@ const appUserSchema = new Schema({
         required: true
     },
     phone: {
-        type: String,        
+        type: String,
+        unique: true        
     },
     secodary_phone: {
-        type: String,        
+        type: String,
+        unique: true        
     },
     email: {
         type: String,
@@ -24,12 +26,7 @@ const appUserSchema = new Schema({
     },
     alternate_email: {
         type: String
-    },
-    client_id: {
-        type: String,
-        required: true,        
-    },
-    
+    },       
     role: {
         type: String,
         enum: ['Admin', 'Tenant', 'App_User'],
@@ -43,6 +40,6 @@ const appUserSchema = new Schema({
 });
 
 // Create the Client model
-const appUser = mongoose.model('Client', appUserSchema);
+const clientModel = mongoose.model('Client', clientScema);
 
-module.exports = appUser;
+module.exports = clientModel;
