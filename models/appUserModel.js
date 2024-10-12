@@ -27,6 +27,10 @@ const appUserSchema = new Schema({
         type: String,
         enum: ['Admin', 'Reporter', 'Reviewer', 'Publisher','App_User'],
         default: 'App_User',        
+    },
+    firstLogin: { 
+        type: Boolean, 
+        default: true
     }
 })
 

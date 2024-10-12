@@ -9,8 +9,7 @@ const tenantSchema = new Schema({
     },
     group: {
         type: Boolean,
-        default: false,
-        required: true        
+        default: false,                
     },
     phone: {
         required: true,
@@ -34,13 +33,20 @@ const tenantSchema = new Schema({
     },
     role: {
         type: String,
-        enum: ['Tenant', 'App_User'],
-        required: true,
+        enum: ['Tenant', 'App_User'],        
         default: 'App_User'
     },
     password: {
         type: String,
-        required: true
+        required: false
+    },
+    firstLogin: { 
+        type: Boolean, 
+        default: true
+    },
+    activated: { 
+        type: Boolean, 
+        default: false
     }
 });
 

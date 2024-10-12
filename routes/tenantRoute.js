@@ -6,137 +6,163 @@ const Tenant = require("../models/tenantModel");
 const App_User = require("../models/appUserModel");
 const { protect, authorize } = require("../middleware/auth");
 
-router.post("/create", protect, authorize("Client_Admin"), async (req, res) => {
-  const {
-    name,
-    password,
-    rc_number,
-    email,
-    secondary_email,
-    phone,
-    secondary_phone,
-    role,
-  } = req.body;
+exports.create = [
+  protect,
+  authorize("Client_Admin"),
+  async (req, res) => {
+    const {
+      name,
+      password,
+      rc_number,
+      email,
+      secondary_email,
+      phone,
+      secondary_phone,
+      role,
+    } = req.body;
 
-  //Check if all required data has been entered
-  if (
-    !(
-      username &&
-      password &&
-      name &&
-      email &&
-      secondary_email &&
-      phone &&
-      secondary_phone &&
-      role &&
-      rc_number
-    )
-  ) {
-    res.status(400).send("All input is required");
-  }
-  if (role !== "App_User") {
-    return res
-      .status(403)
-      .json({ message: "Client_Admin can only create App_Users" });
-  }
-  try {
-    const appUserExist = await User.findOne({
-      $or: [{ username: username }, { email: email }],
-    });
-    if (appUserExist) {
-      res.status(400).json({ message: "A user with this info already exist." });
-    } else {
-      hashedPassword = await bcrypt.hash(password, 10);
-      const user = new User({
-        username: username,
-        email: email,
-        password: hashedPassword,
-        role: role,
-        company: company,
-      });
-      await user.save();
-      res.status(201).json(user);
+    //Check if all required data has been entered
+    if (
+      !(
+        username &&
+        password &&
+        name &&
+        email &&
+        secondary_email &&
+        phone &&
+        secondary_phone &&
+        role &&
+        rc_number
+      )
+    ) {
+      res.status(400).send("All input is required");
     }
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.delete("/:id", protect, authorize("Client_Admin"), async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (user.role !== "App_User") {
+    if (role !== "App_User") {
       return res
         .status(403)
-        .json({ message: "Client_Admin can only delete App_Users" });
+        .json({ message: "Client_Admin can only create App_Users" });
     }
-    await user.remove();
-    res.status(200).json({ message: "User deleted" });
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.put("/:id", protect, authorize("Client_Admin"), async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    res.status(200).json(user);
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.post("/register", async (req, res) => {
-  const { email, rc_number, password, phone, name, } = req.body; // Get data from Vue.js form
-
-  try {
-    // Validate the RC_Number
-    const tenant = await Tenant.findOne({ rc_number });
-    if (!tenant) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or expired registration link" });
+    try {
+      const appUserExist = await User.findOne({
+        $or: [{ username: username }, { email: email }],
+      });
+      if (appUserExist) {
+        res
+          .status(400)
+          .json({ message: "A user with this info already exist." });
+      } else {
+        hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({
+          username: username,
+          email: email,
+          password: hashedPassword,
+          role: role,
+          company: company,
+        });
+        await user.save();
+        res.status(201).json(user);
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Server error" });
     }
+  },
+];
 
-    // Ensure user isn't already registered
-    const existingUser = await App_User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already registered" });
+exports.delete = [
+  protect,
+  authorize("Client_Admin"),
+  async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id);
+      if (user.role !== "App_User") {
+        return res
+          .status(403)
+          .json({ message: "Client_Admin can only delete App_Users" });
+      }
+      await user.remove();
+      res.status(200).json({ message: "User deleted" });
+    } catch (err) {
+      res.status(500).json({ message: "Server error" });
     }
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // Register new App_User under the Tenant's RC_Number
-    const newUser = new App_User({
-      email,
-      name,
-      phone,
-      rc_number,
-      password: hashedPassword, // Hash before saving
-    });
-    await newUser.save();
-    res.status(201).json({ message: "Registration successful", user: newUser });
-  } catch (error) {
-    res.status(500).json({ message: "Registration failed", error });
-    console.log(error);
-  }
-});
+  },
+];
+
+exports.update = [
+  protect,
+  authorize("Client_Admin"),
+  async (req, res) => {
+    try {
+      const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+      });
+      res.status(200).json(user);
+    } catch (err) {
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+];
+
+exports.register = [
+  async (req, res) => {
+    const { email, rc_number, password, phone, name } = req.body; // Get data from Vue.js form
+
+    try {
+      // Validate the RC_Number
+      const tenant = await Tenant.findOne({ rc_number });
+      if (!tenant) {
+        return res
+          .status(400)
+          .json({ message: "Invalid or expired registration link" });
+      }
+
+      // Ensure user isn't already registered
+      const existingUser = await App_User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: "User already registered" });
+      }
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      // Register new App_User under the Tenant's RC_Number
+      const newUser = new App_User({
+        email,
+        name,
+        phone,
+        rc_number,
+        password: hashedPassword, // Hash before saving
+      });
+      await newUser.save();
+      res
+        .status(201)
+        .json({ message: "Registration successful", user: newUser });
+    } catch (error) {
+      res.status(500).json({ message: "Registration failed", error });
+      console.log(error);
+    }
+  },
+];
+
 //Nodemailer
 const transporter = nodemailer.createTransport({
-  service: "Hotmail",
+  service: "Gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL,
     pass: process.env.PASSWORD,
   },
 });
-router.post("/send-link", async (req, res) => {
+exports.sendlink = [ async (req, res) => {
   const { email, rc_number } = req.body;
   try {
     const tenant = await Tenant.findOne({ rc_number });
     if (!tenant) {
       return res.status(400).json({ message: "Invalid RC Number" });
+    }
+    const app_user = await App_User.findOne({ email });
+    if (app_user) {
+      return res.status(400).json({ message: "App User Already Exsist" });
     }
     //Generate App_User registration link
     const registrationLink = `https://conebox.vercel.app/register?email=${email}&rc_number=${rc_number}`;
@@ -157,6 +183,4 @@ router.post("/send-link", async (req, res) => {
     res.status(500).send("Error generating link");
     console.error(err);
   }
-});
-
-module.exports = router;
+}]

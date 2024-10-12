@@ -6,12 +6,6 @@ const AppUser = require("../models/appUserModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-function generateAccessToken(user) {
-  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "3h",
-  });
-}
-
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   // Try to find the user in the User model first
