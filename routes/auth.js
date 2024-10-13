@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Admin = require("../models/adminModel");
-const Client = require("../models/clientModel");
+const Tenant = require("../models/tenantModel");
 const AppUser = require("../models/appUserModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -26,7 +26,7 @@ router.post("/login", async (req, res) => {
     }
   }
   // If user not found in User model, check in Client model
-  let client = await Client.findOne({ email });
+  let client = await Tenant.findOne({ email });
   if (client) {
     const isMatch = await bcrypt.compare(password, client.password);
     if (isMatch) {
@@ -58,7 +58,7 @@ router.post("/login", async (req, res) => {
     }
   }
   // If neither User nor Client was found
-  console.log(res);
+  
   return res.status(401).json({ message: "Invalid username or password" });
 });
 

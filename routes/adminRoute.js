@@ -2,7 +2,7 @@ const Tenant = require("../models/tenantModel");
 const Admin = require("../models/adminModel");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
-const { protect, authorize } = require("../middleware/auth");
+const { adminprotect, authorize } = require("../middleware/auth");
 
 //Nodemailer
 const transporter = nodemailer.createTransport({
@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 });
 
 //List All Clients
-exports.tenants = [
+exports.tenants = [ adminprotect, authorize("Admin"),
   async (req, res) => {
     console.log("working link");
     try {
@@ -31,7 +31,7 @@ exports.tenants = [
 ];
 
 //Activate Tenant
-exports.activate = [
+exports.activate = [ authorize("Admin"), adminprotect,
   async (req, res) => {
     const rc_number = req.query.rc_number;
     try {
@@ -84,7 +84,7 @@ exports.activate = [
 ];
 
 exports.addadmin = [
-  protect,
+  adminprotect,
   authorize("Admin"),
   async (req, res) => {
     const { email, name, password, role } = req.body;
@@ -113,3 +113,35 @@ exports.addadmin = [
     }
   },
 ];
+
+exports.addclient = [async (req, res) => {
+  const {name, rc_number, address, phone, email, group, secondary_email, secondary_phone} = req.body;
+
+  if(!(name && rc_number && phone && email && address)) {
+    return res.status(401).json({message: "All fields are required."})
+  }
+  try {
+    const clientExist = await Tenant.findOne({rc_number});
+    if (clientExist) {
+      return res.status(400).json({message: "A company already exist with this data"});
+    } else {
+      const client = new Tenant({
+        name: name,
+        address: address,
+        rc_number: rc_number,
+        email: email,
+        phone: phone,
+        secondary_email: secondary_email,
+        secondary_phone: secondary_phone,
+        group: group,
+        role: "Tenant"
+      })
+      await client.save();
+      res.status(201).json({message: "Client added successfully"})
+    }
+  } catch (err) {
+    res.status(500).json({message: "Server error"});
+    console.error(err)
+  }
+
+}]
