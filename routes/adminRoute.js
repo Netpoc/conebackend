@@ -33,53 +33,46 @@ exports.activate = [
   async (req, res) => {
     const rc_number = req.query.rc_number;
     try {
-      const user = await Tenant.findOne({rc_number});
+      const user = await Tenant.findOne({ rc_number });
       if (!user) {
+        return res.status(404).json({ message: "Activation failed, Client not found." });
+      }
+      //Generate App_User registration link
+      const email = user.email;
+      const phone = user.phone;         
+      const registrationLink = `https://conebox.vercel.app/register?email=${email}&rc_number=${rc_number}&phone=${phone}`;
+
+      //Send registration link via email
+      const mailOption = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: "Complete Your Registration",
+        text: `Click this link to complete you registration: ${registrationLink}`,
+      };
+
+      transporter.sendMail(mailOption, (error, info) => {
+        if (!error) {
+          return res.status(400).json({ message: "Activation email sent successfully" });
+        }
+      });
+
+      const activate = await Tenant.findOneAndUpdate(
+        { rc_number: rc_number },
+        { activated: true },
+        { new: true }
+      );
+
+      if (!activate) {
         res
           .status(404)
           .json({ message: "Activation failed, Client not found." });
-      } else {
-        const email = user.email;
-        const phone = user.phone;
-        const name = user.name;
-        //Generate App_User registration link
-        const registrationLink = `https://conebox.vercel.app/register?email=${email}&rc_number=${rc_number}&name=${name}&phone=${phone}`;
-
-        //Send registration link via email
-        const mailOption = {
-          from: process.env.EMAIL,
-          to: email,
-          subject: "Complete Your Registration",
-          text: `Click this link to complete you registration: ${registrationLink}`,
-        };
-
-        transporter.sendMail(mailOption, (error, info) => {
-          if (error) {
-            console.log("Email sending failed", error);
-          } else {
-            res.status(200).send("Registration link sent successfully");
-          }
-        });
-
-        const activate = await Tenant.findOneAndUpdate(
-          { rc_number: rc_number },
-          { activated: true },
-          { new: true }
-        );
-
-        if (!activate) {
-          res
-            .status(404)
-            .json({ message: "Activation failed, Client not found." });
-        }
       }
-      res.json({
-        message: "User activated successfully.",
-        user
-      });
 
+      res.json({
+        message: "User activated successfully.",        
+      });
     } catch (err) {
-      console.error(err);      
+      console.error(err);
     }
   },
 ];
