@@ -2,7 +2,7 @@ const Tenant = require("../models/tenantModel");
 const Admin = require("../models/adminModel");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
-//const { protect, authorize } = require("../middleware/auth");
+const { protect, authorize } = require("../middleware/auth");
 
 //Nodemailer
 const transporter = nodemailer.createTransport({
@@ -84,6 +84,8 @@ exports.activate = [
 ];
 
 exports.addadmin = [
+  protect,
+  authorize("Admin"),
   async (req, res) => {
     const { email, name, password, role } = req.body;
 
