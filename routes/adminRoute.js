@@ -31,7 +31,7 @@ exports.tenants = [ adminprotect, authorize("Admin"),
 ];
 
 //Activate Tenant
-exports.activate = [ authorize("Admin"), adminprotect,
+exports.activate = [
   async (req, res) => {
     const rc_number = req.query.rc_number;
     try {
