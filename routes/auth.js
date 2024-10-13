@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Admin = require("../models/tenantModel");
+const Admin = require("../models/adminModel");
 const Client = require("../models/clientModel");
 const AppUser = require("../models/appUserModel");
 const jwt = require("jsonwebtoken");

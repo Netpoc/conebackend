@@ -105,7 +105,7 @@ exports.update = [
 
 exports.register = [
   async (req, res) => {
-    const { email, rc_number, password, phone, name } = req.body; // Get data from Vue.js form
+    const { email, rc_number, address, group, phone, name } = req.body; // Get data from Vue.js form
 
     try {
       // Validate the RC_Number
@@ -121,15 +121,16 @@ exports.register = [
       if (existingUser) {
         return res.status(400).json({ message: "User already registered" });
       }
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
+      
       // Register new App_User under the Tenant's RC_Number
       const newUser = new App_User({
         email,
         name,
         phone,
+        address,
+        group,
         rc_number,
-        password: hashedPassword, // Hash before saving
+        
       });
       await newUser.save();
       res

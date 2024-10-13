@@ -1,5 +1,7 @@
 const Tenant = require("../models/tenantModel");
+const Admin = require("../models/adminModel");
 const nodemailer = require("nodemailer");
+const bcrypt = require("bcryptjs");
 //const { protect, authorize } = require("../middleware/auth");
 
 //Nodemailer
@@ -35,11 +37,13 @@ exports.activate = [
     try {
       const user = await Tenant.findOne({ rc_number });
       if (!user) {
-        return res.status(404).json({ message: "Activation failed, Client not found." });
+        return res
+          .status(404)
+          .json({ message: "Activation failed, Client not found." });
       }
       //Generate App_User registration link
       const email = user.email;
-      const phone = user.phone;         
+      const phone = user.phone;
       const registrationLink = `https://conebox.vercel.app/register?email=${email}&rc_number=${rc_number}&phone=${phone}`;
 
       //Send registration link via email
@@ -52,7 +56,9 @@ exports.activate = [
 
       transporter.sendMail(mailOption, (error, info) => {
         if (!error) {
-          return res.status(400).json({ message: "Activation email sent successfully" });
+          return res
+            .status(400)
+            .json({ message: "Activation email sent successfully" });
         }
       });
 
@@ -69,9 +75,38 @@ exports.activate = [
       }
 
       res.json({
-        message: "User activated successfully.",        
+        message: "User activated successfully.",
       });
     } catch (err) {
+      console.error(err);
+    }
+  },
+];
+
+exports.addadmin = [
+  async (req, res) => {
+    const { email, name, password, role } = req.body;
+
+    if (!(email && name && password && role)) {
+      res.status(400).json({ message: "All inputs are required" });
+    }
+    try {
+      const admin = await Admin.findOne({ email });
+      if (admin) {
+        res.status(400).json({ message: "A user already exist" });
+      } else {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const admin = new Admin({
+          name: name,
+          password: hashedPassword,
+          role: 'Admin',
+          email: email
+        })
+        await admin.save();
+        res.status(201).json(admin)
+      }
+    } catch (err) {
+      res.status(500).json({message: "Server error"});
       console.error(err);
     }
   },

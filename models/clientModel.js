@@ -11,6 +11,11 @@ const clientScema = new Schema({
         type: String,
         required: true
     },
+    address:{
+        type: String,
+        required: true,
+
+    },
     phone: {
         type: String,
         unique: true        
@@ -29,7 +34,7 @@ const clientScema = new Schema({
     },       
     role: {
         type: String,
-        enum: ['Admin', 'Tenant', 'App_User'],
+        enum: ['Tenant', 'App_User'],
         required: true,
         default: 'App_User'
     },
