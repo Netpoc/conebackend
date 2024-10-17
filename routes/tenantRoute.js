@@ -103,6 +103,15 @@ exports.update = [
   },
 ];
 
+//Tenant Profile update with password
+exports.updateProfile = [
+  async (req, res) => {
+    const {password, group} = req.body;
+
+
+  }
+]
+
 exports.register = [
   async (req, res) => {
     const { email, rc_number, address, group, phone, name } = req.body; // Get data from Vue.js form
@@ -154,6 +163,8 @@ const transporter = nodemailer.createTransport({
     pass: process.env.PASSWORD,
   },
 });
+
+//App-User Registration Link
 exports.sendlink = [ async (req, res) => {
   const { email, rc_number } = req.body;
   try {
@@ -166,7 +177,7 @@ exports.sendlink = [ async (req, res) => {
       return res.status(400).json({ message: "App User Already Exsist" });
     }
     //Generate App_User registration link
-    const registrationLink = `https://conebox.vercel.app/register?email=${email}&rc_number=${rc_number}`;
+    const registrationLink = `https://conebox.vercel.app/tenant_complete_registration?email=${email}&rc_number=${rc_number}`;
 
     //Send registration link via email
     const mailOption = {
