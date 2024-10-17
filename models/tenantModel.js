@@ -9,7 +9,14 @@ const tenantSchema = new Schema({
     },
     group: {
         type: Boolean,
-        default: false,                
+        default: false,
+        required: true                
+    },
+    parent: {
+        type: String,
+    },
+    percentage: {
+        type: String,
     },
     phone: {
         required: true,
