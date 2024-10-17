@@ -106,9 +106,18 @@ exports.update = [
 //Tenant Profile update with password
 exports.updateProfile = [
   async (req, res) => {
-    const {password, group} = req.body;
+    const {password, group, percent, parent, rc_number} = req.body;
+    if (!(password && group )) {
+      res.status(400).json({message: "All fields are required"})
+    }
+    try {
+      const update = await Tenant.findOneAndUpdate({rc_number})
+      if(!update) {
+        
+      }
+    } catch(err){
 
-
+    }
   }
 ]
 
