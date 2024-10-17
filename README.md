@@ -30,3 +30,11 @@ The app is a SaaS financial reporting platform designed to streamline financial 
 
 ### Consolidation and Elimination Entries (CPEE)
 - Subsidiary data can be consolidated, with elimination entries for intercompany transactions.
+
+## .env Configuration for Backend
+To get this backend ready for testing, ensure your .env file includes the following environment variables:
+
+- LIVE_DB: URL or connection string for the live database (e.g., MongoDB URI).
+- EMAIL: The email address used for application notifications and authentication.
+- PASSWORD: Password for the email account specified above.
+- JWT_SECRET: Secret key for JSON Web Token (JWT) signing and verification to secure user sessions.
