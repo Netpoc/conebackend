@@ -17,7 +17,9 @@ const transporter = nodemailer.createTransport({
 });
 
 //List All Clients
-exports.tenants = [ adminprotect, authorize("Admin"),
+exports.tenants = [
+  adminprotect,
+  authorize("Admin"),
   async (req, res) => {
     console.log("working link");
     try {
@@ -83,6 +85,32 @@ exports.activate = [
   },
 ];
 
+//Deactivate Tenant
+exports.deactivate = [
+  async (req, res) => {
+    const rc_number = req.query.rc_number;
+    try {
+      const activate = await Tenant.findOneAndUpdate(
+        { rc_number: rc_number },
+        { activated: false },
+        { new: true }
+      );
+      if (!activate) {
+        res
+          .status(404)
+          .json({ message: "Dactivation failed, Client not found." });
+      }
+      res.json({
+        message: "User deactivated successfully.",
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  },
+];
+
+
+//Add New Admin
 exports.addadmin = [
   adminprotect,
   authorize("Admin"),
@@ -101,47 +129,61 @@ exports.addadmin = [
         const admin = new Admin({
           name: name,
           password: hashedPassword,
-          role: 'Admin',
-          email: email
-        })
+          role: "Admin",
+          email: email,
+        });
         await admin.save();
-        res.status(201).json(admin)
+        res.status(201).json(admin);
       }
     } catch (err) {
-      res.status(500).json({message: "Server error"});
+      res.status(500).json({ message: "Server error" });
       console.error(err);
     }
   },
 ];
 
-exports.addclient = [async (req, res) => {
-  const {name, rc_number, address, phone, email, group, secondary_email, secondary_phone} = req.body;
 
-  if(!(name && rc_number && phone && email && address)) {
-    return res.status(401).json({message: "All fields are required."})
-  }
-  try {
-    const clientExist = await Tenant.findOne({rc_number});
-    if (clientExist) {
-      return res.status(400).json({message: "A company already exist with this data"});
-    } else {
-      const client = new Tenant({
-        name: name,
-        address: address,
-        rc_number: rc_number,
-        email: email,
-        phone: phone,
-        secondary_email: secondary_email,
-        secondary_phone: secondary_phone,
-        group: group,
-        role: "Tenant"
-      })
-      await client.save();
-      res.status(201).json({message: "Client added successfully"})
+//Add New Client
+exports.addclient = [
+  async (req, res) => {
+    const {
+      name,
+      rc_number,
+      address,
+      phone,
+      email,
+      group,
+      secondary_email,
+      secondary_phone,
+    } = req.body;
+
+    if (!(name && rc_number && phone && email && address)) {
+      return res.status(401).json({ message: "All fields are required." });
     }
-  } catch (err) {
-    res.status(500).json({message: "Server error"});
-    console.error(err)
-  }
-
-}]
+    try {
+      const clientExist = await Tenant.findOne({ rc_number });
+      if (clientExist) {
+        return res
+          .status(400)
+          .json({ message: "A company already exist with this data" });
+      } else {
+        const client = new Tenant({
+          name: name,
+          address: address,
+          rc_number: rc_number,
+          email: email,
+          phone: phone,
+          secondary_email: secondary_email,
+          secondary_phone: secondary_phone,
+          group: group,
+          role: "Tenant",
+        });
+        await client.save();
+        res.status(201).json({ message: "Client added successfully" });
+      }
+    } catch (err) {
+      res.status(500).json({ message: "Server error" });
+      console.error(err);
+    }
+  },
+];
