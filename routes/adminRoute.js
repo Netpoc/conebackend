@@ -46,7 +46,7 @@ exports.activate = [
       //Generate App_User registration link
       const email = user.email;
       const phone = user.phone;
-      const registrationLink = `https://conebox.vercel.app/register?email=${email}&rc_number=${rc_number}&phone=${phone}`;
+      const registrationLink = `https://conebox.vercel.app/tenant_complete_registration?email=${email}&rc_number=${rc_number}&phone=${phone}`;
 
       //Send registration link via email
       const mailOption = {
