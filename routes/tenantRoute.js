@@ -107,16 +107,22 @@ exports.update = [
 exports.updateProfile = [
   async (req, res) => {
     const {password, group, percent, parent, rc_number} = req.body;
-    if (!(password && group )) {
-      res.status(400).json({message: "All fields are required"})
+    if (!(password && group && rc_number)) {
+      res.status(400).json({message: "All fields are required"});
     }
     try {
-      const update = await Tenant.findOneAndUpdate({rc_number})
-      if(!update) {
-        
-      }
+      const hashedPassword = await bcrypt.hash(password, 10)
+      const update = await Tenant.updateOne({rc_number: rc_number}, 
+        { $set: {
+          password: hashedPassword,
+          group: group,
+          percent: percent,
+          parent: parent
+      }});
+      res.status(200).json(update);
     } catch(err){
-
+      console.error(err)
+      res.status(500).json({message: "Server error"});
     }
   }
 ]

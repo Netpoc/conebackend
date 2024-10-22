@@ -15,7 +15,7 @@ const tenantSchema = new Schema({
     parent: {
         type: String,
     },
-    percentage: {
+    percent: {
         type: String,
     },
     phone: {
