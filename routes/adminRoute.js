@@ -100,7 +100,7 @@ exports.deactivate = [
           .status(404)
           .json({ message: "Dactivation failed, Client not found." });
       }
-      res.json({
+      return res.status(200).json({
         message: "User deactivated successfully.",
       });
     } catch (err) {
@@ -187,3 +187,21 @@ exports.addclient = [
     }
   },
 ];
+
+
+//Delete a Client
+exports.deleteClient = [
+  async (req, res) => {
+    const rc_number = req.query.rc_number;
+    try {
+      const result = await Tenant.deleteOne({rc_number});
+      if(result.deletedCount != 1) {        
+        return res.status(400).json({message: 'Tenant delete operation failed.'})
+      }
+      console.log(result);
+      res.status(200).json({message: 'Tenant was successfully removed'})
+    } catch (error) {
+      res.status(500).json({message: 'Server failure'})
+    }
+  }
+]
