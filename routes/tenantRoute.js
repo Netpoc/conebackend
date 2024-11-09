@@ -192,13 +192,13 @@ exports.sendlink = [ async (req, res) => {
       return res.status(400).json({ message: "App User Already Exsist" });
     }
     //Generate App_User registration link
-    const registrationLink = `https://conebox.vercel.app/tenant_complete_registration?email=${email}&rc_number=${rc_number}`;
+    const registrationLink = `https://conebox.vercel.app/appuser_register?email=${email}&rc_number=${rc_number}`;
 
     //Send registration link via email
     const mailOption = {
       from: process.env.EMAIL,
       to: email,
-      subject: "Complete Your Registration",
+      subject: "Complete App User Registration",
       text: `Click this link to complete you registration: ${registrationLink}`,
     };
 
