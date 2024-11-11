@@ -153,8 +153,7 @@ exports.register = [
         phone,
         address,
         group,
-        rc_number,
-        
+        rc_number,        
       });
       await newUser.save();
       res
@@ -209,5 +208,32 @@ exports.sendlink = [ async (req, res) => {
   } catch (err) {
     res.status(500).send("Error generating link");
     console.error(err);
+  }
+}]
+
+//Add User Complete Registration
+exports.createAppUser = [ async (req, res) => {
+  try {
+    const { name, phone, email, rc_number, password } = req.body;
+    if (!(name && phone && email && rc_number && password)) {
+      return res.status(400).json('All fields are required');
+    }
+    const response = await Tenant.findOne({rc_number});
+    if (!response) {
+      res.status(404).json('Invalid Company or Unauthorized Application')
+    } else {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const AppUser = new App_User({
+        name: name,
+        password: hashedPassword,
+        phone: phone,
+        role: 'App_User',
+        rc_number: rc_number,
+      });
+      await AppUser.save();
+      res.status(201).json('App User added successfully');
+    }    
+  } catch (error) {
+    console.error(error);
   }
 }]
