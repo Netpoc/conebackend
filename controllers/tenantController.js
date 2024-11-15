@@ -5,6 +5,6 @@ const tenantRoute = require("../routes/tenantRoute");
 
 router.post('/adduser', tenantRoute.sendlink);
 router.put('/update-profile', tenantRoute.updateProfile);
-router.post('/tenant/register', tenantRoute.createAppUser);
+router.post('/register', tenantRoute.createAppUser);
 
 module.exports = router;
