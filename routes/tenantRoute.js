@@ -227,6 +227,7 @@ exports.createAppUser = [ async (req, res) => {
         name: name,
         password: hashedPassword,
         phone: phone,
+        email: email,
         role: 'App_User',
         rc_number: rc_number,
       });
