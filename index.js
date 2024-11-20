@@ -27,12 +27,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 const adminController = require("./controllers/adminController");
 const tenantController = require("./controllers/tenantController");
-
+const appUserController = require("./controllers/appUserController");
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/tenant", tenantController);
 app.use("/api/admin", adminController);
+app.use("/api/appuser", appUserController);
 
 app.get("/tenants", async (req, res) => {
   try{
